@@ -42,6 +42,8 @@ void HeapSort(std::vector<int>& array)
     int length = (int)array.size();
 
     // 힙 구성.
+    // 자식 노드 length / 2 에서 length - 1 까지.
+    // length / 2 - 1 마지막 부모 노드.
     for (int ix = length / 2 - 1; ix >= 0; --ix)
     {
         // 힙 만들기.
