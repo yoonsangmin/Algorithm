@@ -134,65 +134,219 @@ bool ParseMap(const char* path)
     // 파일 열기.
     FILE* file = nullptr;
     fopen_s(&file, path, "r");
-    if (file)
+    if (file == nullptr)
     {
-        // 첫 줄 읽기.
-        char buffer[256] = { };
-        if (!fgets(buffer, 256, file))
-        {
-            fclose(file);
-            return false;
-        }
-        
-        // 맵 크기 설정.
-        sscanf_s(buffer, "size %d", &mapSize);
-
-        // 줄 데이터 저장을 위한 임시 배열 선언.
-        std::vector<char> line;
-        line.reserve(mapSize);
-
-        // 맵 데이터 해성을 위한 루프.
-        while (fgets(buffer, 256, file))
-        {
-            // 첫 칸 처리.
-            char* context = nullptr;
-            char* splitString = strtok_s(buffer, ",", &context);
-            if (splitString)
-            {
-                line.emplace_back(splitString[0]);
-            }
-
-            // 둘째부터는 루프.
-            while (context)
-            {
-                splitString = strtok_s(nullptr, ",", &context);
-                if (!splitString)
-                {
-                    break;
-                }
-
-                line.emplace_back(splitString[0]);
-            }
-
-            // 처리된 라인 데이터를 맵에 추가.
-            map.emplace_back(line);
-            line.clear();
-        }
-
-        fclose(file);
-        return true;
+        return false;
     }
 
-    return false;
+    // 첫 줄 읽기.
+    char buffer[256] = { };
+    if (!fgets(buffer, 256, file))
+    {
+        fclose(file);
+        return false;
+    }
+
+    // 맵 크기 설정.
+    sscanf_s(buffer, "size %d", &mapSize);
+    if (mapSize == 0)
+    {
+        return false;
+    }
+    
+    map.reserve(mapSize);
+
+    // 줄 데이터 저장을 위한 임시 배열 선언.
+    std::vector<char> line;
+    line.reserve(mapSize);
+
+    int eCount = 0, xCount = 0;
+    // 맵 데이터 해성을 위한 루프.
+    while (fgets(buffer, 256, file))
+    {
+        // 첫 칸 처리.
+        char* context = nullptr;
+        char* splitString = strtok_s(buffer, ",", &context);
+        if (splitString)
+        {
+            line.emplace_back(splitString[0]);
+        }
+
+        if (line.back() == 'e')
+        {
+            ++eCount;
+        }
+        else if (line.back() == 'x')
+        {
+            ++xCount;
+        }
+
+        // 둘째부터는 루프.
+        while (context)
+        {
+            splitString = strtok_s(nullptr, ",", &context);
+            if (!splitString)
+            {
+                break;
+            }
+
+            line.emplace_back(splitString[0]);
+
+            if (line.back() == 'e')
+            {
+                ++eCount;
+            }
+            else if (line.back() == 'x')
+            {
+                ++xCount;
+            }
+        }
+
+        // 처리된 라인 데이터를 맵에 추가.
+        map.emplace_back(line);
+        line.clear();
+    }
+
+    if (eCount != 1 || xCount != 1)
+    {
+        return false;
+    }
+
+    fclose(file);
+    return true;
+}
+
+bool MakeMap(const char* path)
+{
+    std::cout << "맵의 크기를 입력해주세요.\n";
+    std::cout << "맵의 크기는 한 변이 128이하인 정사각형입니다.\n";
+    while (mapSize <= 0 || mapSize > 128)
+    {
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cin >> mapSize;
+
+        if (mapSize <= 0 || mapSize > 128)
+        {
+            std::cout << "다시 입력해주세요.\n";
+        }
+    }
+
+    map.assign(mapSize, std::vector<char>(mapSize, '1'));
+
+    std::cout << "맵 데이터를 입력해주세요.\n";
+    std::cout << "띄워쓰기로 열을 구분하고 줄바꿈으로 행을 구분해주세요.\n";
+    std::cout << "e는 시작점, x는 도착점입니다.\n";
+    std::cout << "0는 이동 가능한 길, 나머지 문자는 벽입니다.\n";
+
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    char input;
+    int eCount = 0, xCount = 0;
+    for (int ix = 0; ix < mapSize; ++ix)
+    {
+        for (int jx = 0; jx < mapSize; ++jx)
+        {
+            std::cin >> input;
+
+            if (input == 'e' || input == 'x' || input == '0')
+            {
+                map[ix][jx] = input;
+
+                if (input == 'e')
+                {
+                    ++eCount;
+                }
+
+                if (input == 'x')
+                {
+                    ++xCount;
+                }
+            }
+        }
+    }
+
+    if (eCount != 1 || xCount != 1)
+    {
+        return false;
+    }
+
+    // 파일 열기.
+    FILE* file = nullptr;
+    fopen_s(&file, path, "w");
+
+    if (file == nullptr)
+    {
+        return false;
+    }
+
+    char buffer[257] = { };
+    sprintf_s(buffer, "size %d\n", mapSize);
+    fputs(buffer, file);
+
+    for (int ix = 0; ix < mapSize; ++ix)
+    {
+        for (int jx = 0; jx < mapSize; ++jx)
+        {
+            buffer[jx * 2] = map[ix][jx];
+
+            if (jx != mapSize - 1)
+            {
+                buffer[jx * 2 + 1] = ',';
+                continue;
+            }
+            
+            buffer[jx * 2 + 1] = '\n';
+            buffer[jx * 2 + 2] = '\0';
+        }
+
+        fputs(buffer, file);
+    }
+
+    fclose(file);
+
+    return true;
 }
 
 int main()
 {
-    // 미로 탐색.
-    if (ParseMap("../Assets/Map.txt"))
+    int input;
+    bool isValid = false;
+    while (!isValid)
     {
-        EscapeMaze();
+        map.clear();
+        std::cout << "0: 맵 만들기, 1: 파일 불러오기\n";
+        std::cin >> input;
+
+        system("cls");
+        if (input == 0)
+        {
+            isValid = MakeMap("../Assets/Map.txt");
+            if (!isValid)
+            {
+                system("cls");
+                std::cout << "맵 생성에 실패했습니다.\n";
+            }
+        }
+        if (input == 1)
+        {
+            isValid = ParseMap("../Assets/Map.txt");
+            if (!isValid)
+            {
+                std::cout << "맵 로딩에 실패했습니다.\n";
+            }
+        }
+        else
+        {
+            std::cout << "잘못된 입력입니다.\n";
+        }
+        
+        std::cout << "다시 입력해주세요\n";
     }
+
+    system("cls");
+
+    // 미로 탐색.
+    EscapeMaze();
 
     std::cin.get();
 }
