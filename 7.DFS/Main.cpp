@@ -168,29 +168,10 @@ bool ParseMap(const char* path)
         // 첫 칸 처리.
         char* context = nullptr;
         char* splitString = strtok_s(buffer, ",", &context);
-        if (splitString)
-        {
-            line.emplace_back(splitString[0]);
-        }
-
-        if (line.back() == 'e')
-        {
-            ++eCount;
-        }
-        else if (line.back() == 'x')
-        {
-            ++xCount;
-        }
 
         // 둘째부터는 루프.
-        while (context)
+        while (splitString != nullptr)
         {
-            splitString = strtok_s(nullptr, ",", &context);
-            if (!splitString)
-            {
-                break;
-            }
-
             line.emplace_back(splitString[0]);
 
             if (line.back() == 'e')
@@ -201,6 +182,7 @@ bool ParseMap(const char* path)
             {
                 ++xCount;
             }
+            splitString = strtok_s(nullptr, ",", &context);
         }
 
         // 처리된 라인 데이터를 맵에 추가.
