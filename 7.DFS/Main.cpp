@@ -18,7 +18,7 @@ struct Location2D
 
 // 맵 배열.
 int mapSize = 0;
-std::vector<std::vector<char>> map;
+std::vector<std::vector<char>> map;//=
 //{
 //    {'1','1','1','1','1','1'},
 //    {'e','0','1','0','0','1'},
@@ -151,6 +151,7 @@ bool ParseMap(const char* path)
     sscanf_s(buffer, "size %d", &mapSize);
     if (mapSize == 0)
     {
+        fclose(file);
         return false;
     }
     
@@ -209,6 +210,7 @@ bool ParseMap(const char* path)
 
     if (eCount != 1 || xCount != 1)
     {
+        fclose(file);
         return false;
     }
 
@@ -320,26 +322,30 @@ int main()
         system("cls");
         if (input == 0)
         {
-            isValid = MakeMap("../Assets/Map.txt");
-            if (!isValid)
+            isValid = MakeMap("../Assets/DFSMap.txt");
+            if (isValid)
             {
-                system("cls");
-                std::cout << "맵 생성에 실패했습니다.\n";
+                break;
             }
+
+            system("cls");
+            std::cout << "맵 생성에 실패했습니다.\n";
         }
-        if (input == 1)
+        else if (input == 1)
         {
-            isValid = ParseMap("../Assets/Map.txt");
-            if (!isValid)
+            isValid = ParseMap("../Assets/DFSMap.txt");
+            if (isValid)
             {
-                std::cout << "맵 로딩에 실패했습니다.\n";
+                break;
             }
+            
+            std::cout << "맵 로딩에 실패했습니다.\n";
         }
         else
         {
             std::cout << "잘못된 입력입니다.\n";
         }
-        
+
         std::cout << "다시 입력해주세요\n";
     }
 
