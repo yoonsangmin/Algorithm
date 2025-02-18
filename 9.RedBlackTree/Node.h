@@ -40,7 +40,7 @@ public:
 
     // 부모 노드.
     inline Node* Parent() const { return parent; }
-    inline void SetParent(Node* newParent) { left = newParent; }
+    inline void SetParent(Node* newParent) { parent = newParent; }
 
     // 왼쪽 자식 노드.
     inline Node* Left() const { return left; }
