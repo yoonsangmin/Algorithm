@@ -90,7 +90,6 @@ int main()
         std::cout << "경로를 찾지 못했습니다.\n";
     }
 
-
     // 목표 노드만 제거.
     SafeDelete(goalNode);
 

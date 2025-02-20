@@ -1,6 +1,10 @@
 ﻿#pragma once
 
 #include <vector>
+#include <unordered_map>
+#include <queue>
+
+#include "Node.h"
 
 // 포인터 삭제 함수.
 template<typename T>
@@ -13,8 +17,16 @@ void SafeDelete(T*& t)
     }
 }
 
+class Comparer
+{
+public:
+    bool operator()(const Node* left, const Node* right)
+    {
+        return left->fCost > right->fCost;
+    }
+};
+
 // A* 길찾기 기능 처리 클래스.
-class Node;
 class AStar
 {
     // 이동 방향 구조체.
@@ -50,18 +62,15 @@ private:
     // 탐색하려는 위치가 범위 안에 있는지 확인하는 함수.
     bool IsInRange(int x, int y, const std::vector<std::vector<int>>& grid);
 
-    // 이미 방문한 위치인지 확인하는 함수.
-    bool HasVisited(int x, int y, float gCost);
-
     // 탐색하려는 위치가 목표 위치인지 확인하는 함수.
     bool IsDestination(const Node* node);
 
 private:
     // 열린 리스트
-    std::vector<Node*> openList;
+    std::priority_queue<Node*, std::vector<Node*>, Comparer> openList;
 
     // 닫힌 리스트
-    std::vector<Node*> closedList;
+    std::unordered_map<Position, Node*> closedList;
 
     // 시작 노드.
     Node* startNode = nullptr;

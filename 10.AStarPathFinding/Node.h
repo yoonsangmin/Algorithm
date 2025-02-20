@@ -10,9 +10,23 @@ struct Position
     {
     }
 
+    bool operator==(const Position& other) const
+    {
+        return x == other.x && y == other.y;
+    }
+
     int x;
     int y;
 };
+
+namespace std {
+    template <>
+    struct hash<Position> {
+        size_t operator()(const Position& p) const noexcept {
+            return (static_cast<std::size_t>(p.x) * 73856093) ^ (static_cast<std::size_t>(p.y) * 19349663);
+        }
+    };
+}
 
 // 노드 클래스.
 class Node
