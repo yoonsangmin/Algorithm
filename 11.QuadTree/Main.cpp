@@ -14,16 +14,18 @@ int main()
     QuadTree tree(Bounds(0, 0, 200, 200));
 
     // 삽입.
-    Node* a = new Node(Bounds(50.1f, 50.1f));
+    Node* a = new Node(Bounds(98, 98));
     tree.Insert(a);
-    Node* b = new Node(Bounds(60, 80));
+    Node* b = new Node(Bounds(99, 99, 2, 2));
     tree.Insert(b);
-    Node* c = new Node(Bounds(90, 120));
+    Node* c = new Node(Bounds(99, 99, 2, 2));
     tree.Insert(c);
-    Node* d = new Node(Bounds(150, 150));
+    Node* d = new Node(Bounds(98, 98, 4, 4));
     tree.Insert(d);
-    Node* e = new Node(Bounds(10, 10));
+    Node* e = new Node(Bounds(97, 97));
     tree.Insert(e);
+    Node* f = new Node(Bounds(96, 96));
+    tree.Insert(f);
 
     std::cout << "노드 삽입 완료.\n";
 

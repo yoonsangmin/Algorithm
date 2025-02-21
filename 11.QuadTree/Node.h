@@ -58,7 +58,7 @@ public:
 
 private:
     // 영역을 4분할할 때 사용할 함수.
-    bool Subdivde();
+    void Subdivde();
 
     // 영역이 분할됐는지 확인하는 함수.
     bool IsDivded();
@@ -73,6 +73,11 @@ private:
     std::vector<NodeIndex> GetQuads(const Bounds& bounds);
 
 private:
+    // 노드에 포함할 수 있는 최대 개수.
+    // 개수가 넘치면 하위 노드로 분할함.
+    // 더 이상 분할할 수 없으면 더 많이 들어갈 수 있음.
+    static const int capacity = 2;
+
     // 현재 노드의 깊이.
     int depth = 0;
 
