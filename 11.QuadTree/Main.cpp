@@ -14,7 +14,7 @@ int main()
     QuadTree tree(Bounds(0, 0, 200, 200));
 
     // 삽입.
-    tree.Insert(new Node(Bounds(50, 50)));
+    tree.Insert(new Node(Bounds(50.1f, 50.1f)));
     tree.Insert(new Node(Bounds(60, 80)));
     tree.Insert(new Node(Bounds(90, 120)));
     tree.Insert(new Node(Bounds(150, 150)));
@@ -22,7 +22,7 @@ int main()
 
     std::cout << "노드 삽입 완료.\n";
 
-    Node testNode(Bounds(45, 45, 20, 20));
+    Node testNode(Bounds(45, 45, 20, 40));
     std::vector<Node*> intersects = tree.Query(&testNode);
     if (intersects.size() == 0)
     {
@@ -31,6 +31,10 @@ int main()
     else
     {
         std::cout << "겹치는 노드를 " << intersects.size() << "개 찾았습니다.\n";
+        for (Node* node : intersects)
+        {
+            std::cout << "(" << node->GetBounds().X() << "," << node->GetBounds().Y() << ")\n";
+        }
     }
 
     std::cin.get();

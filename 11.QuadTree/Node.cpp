@@ -19,7 +19,7 @@ void Node::Insert(Node* node)
     // 겹치면 현재 노드에 추가.
     if (result == NodeIndex::Straddling)
     {
-        points.emplace_back(node);
+        points.emplace(node);
     }
     // 겹치지 않은 경우.
     else if (result != NodeIndex::OutOfArea)
@@ -46,7 +46,7 @@ void Node::Insert(Node* node)
         // 더 이상 나눌 수 없는 경우.
         else
         {
-            points.emplace_back(node);
+            points.emplace(node);
         }
     }
 }
@@ -120,10 +120,10 @@ bool Node::Subdivde()
     if (!IsDivded())
     {
         // 영역을 나누기 위한 값 계산.
-        int x = bounds.X();
-        int y = bounds.Y();
-        int halfWidth = bounds.Width() / 2;
-        int halfHeight = bounds.Height() / 2;
+        float x = bounds.X();
+        float y = bounds.Y();
+        float halfWidth = bounds.Width() / 2;
+        float halfHeight = bounds.Height() / 2;
 
         // 각 4분면의 자식 객체 생성.
         topLeft = new Node(Bounds(x, y, halfWidth, halfHeight), depth + 1);
@@ -178,12 +178,12 @@ std::vector<NodeIndex> Node::GetQuads(const Bounds& bounds)
     std::vector<NodeIndex> quads;
 
     // 영역 계산에 필요한 변수.
-    int x = this->bounds.X();
-    int y = this->bounds.Y();
-    int halfWidth = this->bounds.Width() / 2;
-    int halfHeight = this->bounds.Height() / 2;
-    int centerX = x + halfWidth;
-    int centerY = y + halfHeight;
+    float x = this->bounds.X();
+    float y = this->bounds.Y();
+    float halfWidth = this->bounds.Width() / 2.0f;
+    float halfHeight = this->bounds.Height() / 2.0f;
+    float centerX = x + halfWidth;
+    float centerY = y + halfHeight;
 
     // 왼쪽 영역이랑 겹치는지 확인.
     bool left = bounds.X() < centerX && bounds.MaxX() >= x;

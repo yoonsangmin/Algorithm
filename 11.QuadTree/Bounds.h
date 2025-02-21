@@ -4,27 +4,27 @@
 class Bounds
 {
 public:
-    Bounds(int x, int y, int width = 1, int height = 1)
+    Bounds(float x, float y, float width = 1.0f, float height = 1.0f)
         : x(x), y(y), width(width), height(height)
     {
     }
 
     // Getter.
-    int X() const { return x; }
-    int Y() const { return y; }
-    int Width() const { return width; }
-    int Height() const { return height; }
+    float X() const { return x; }
+    float Y() const { return y; }
+    float Width() const { return width; }
+    float Height() const { return height; }
 
-    int MaxX() const { return x + width; }
-    int MaxY() const { return y + height; }
+    float MaxX() const { return x + width; }
+    float MaxY() const { return y + height; }
 
     // 겹침 판정 함수.
     bool Intersects(const Bounds& other) const;
 
 private:
     // 왼쪽 상단 기준.
-    int x = 0;
-    int y = 0;
-    int width = 1;
-    int height = 1;
+    float x = 0;
+    float y = 0;
+    float width = 1;
+    float height = 1;
 };
