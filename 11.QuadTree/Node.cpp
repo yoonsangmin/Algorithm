@@ -22,33 +22,83 @@ void Node::Insert(Node* node)
     if (result == NodeIndex::Straddling)
     {
         points.emplace(node);
-    }
-    // 겹치지 않은 경우.
-    else if (result != NodeIndex::OutOfArea)
-    {
-        if (Subdivde())
+
+        // 넘치게 저장된 경우 아래로 보낼 수 있는지 체크.
+        if (depth != QuadTree::maxDepth && points.size() >= capacity)
         {
-            if (result == NodeIndex::TopLeft)
+            for (auto iter = points.begin(); iter != points.end();)
             {
-                topLeft->Insert(node);
-            }
-            else if (result == NodeIndex::TopRight)
-            {
-                topRight->Insert(node);
-            }
-            else if (result == NodeIndex::BottomLeft)
-            {
-                bottomLeft->Insert(node);
-            }
-            else if (result == NodeIndex::BottomRight)
-            {
-                bottomRight->Insert(node);
+                Node* currentNode = *iter;
+
+                // 겹치는 영역 확인.
+                result = TestRegion(currentNode->GetBounds());
+
+                // 중간에 겹치지 않고 범위에 포함된 경우.
+                if (result != NodeIndex::Straddling && result != NodeIndex::OutOfArea)
+                {
+                    // 분할.
+                    Subdivde();
+
+                    // 자식에 삽입.
+                    if (result == NodeIndex::TopLeft)
+                    {
+                        topLeft->Insert(currentNode);
+                    }
+                    else if (result == NodeIndex::TopRight)
+                    {
+                        topRight->Insert(currentNode);
+                    }
+                    else if (result == NodeIndex::BottomLeft)
+                    {
+                        bottomLeft->Insert(currentNode);
+                    }
+                    else if (result == NodeIndex::BottomRight)
+                    {
+                        bottomRight->Insert(currentNode);
+                    }
+
+                    continue;
+                }
+
+                ++iter;
+
+                // capacity보다 사이즈가 작아진 경우.
+                if (points.size() < capacity)
+                {
+                    break;
+                }
             }
         }
-        // 더 이상 나눌 수 없는 경우.
-        else
+    }
+    // 중간에 겹치지 않고 범위에 포함된 경우.
+    else if (result != NodeIndex::OutOfArea)
+    {
+        // 최대 깊이에 도달한 경우 또는 현재 노드에서 더 저장할 수 있는 경우.
+        if (depth == QuadTree::maxDepth || points.size() < capacity)
         {
             points.emplace(node);
+            return;
+        }
+
+        // 분할.
+        Subdivde();
+
+        // 자식에 삽입.
+        if (result == NodeIndex::TopLeft)
+        {
+            topLeft->Insert(node);
+        }
+        else if (result == NodeIndex::TopRight)
+        {
+            topRight->Insert(node);
+        }
+        else if (result == NodeIndex::BottomLeft)
+        {
+            bottomLeft->Insert(node);
+        }
+        else if (result == NodeIndex::BottomRight)
+        {
+            bottomRight->Insert(node);
         }
     }
 }
@@ -156,14 +206,8 @@ void Node::Clear()
     }
 }
 
-bool Node::Subdivde()
+void Node::Subdivde()
 {
-    // 최대 깊이에 도달했으면 더 이상 안 나눔.
-    if (depth == QuadTree::maxDepth)
-    {
-        return false;
-    }
-
     // 아직 분할 안 됐으면, 분할 진행.
     if (!IsDivded())
     {
@@ -179,8 +223,6 @@ bool Node::Subdivde()
         bottomLeft = new Node(Bounds(x, y + halfHeight, halfWidth, halfHeight), depth + 1);
         bottomRight = new Node(Bounds(x + halfWidth, y + halfHeight, halfWidth, halfHeight), depth + 1);
     }
-
-    return true;
 }
 
 bool Node::IsDivded()
