@@ -17,6 +17,11 @@ void QuadTree::Insert(Node* node)
     root->Insert(node);
 }
 
+void QuadTree::Remove(Node* node)
+{
+    root->Remove(node);
+}
+
 std::vector<Node*> QuadTree::Query(Node* queryNode)
 {
     // 겹칠 가능성이 있는 영역 확인.

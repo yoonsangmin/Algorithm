@@ -14,13 +14,20 @@ int main()
     QuadTree tree(Bounds(0, 0, 200, 200));
 
     // 삽입.
-    tree.Insert(new Node(Bounds(50.1f, 50.1f)));
-    tree.Insert(new Node(Bounds(60, 80)));
-    tree.Insert(new Node(Bounds(90, 120)));
-    tree.Insert(new Node(Bounds(150, 150)));
-    tree.Insert(new Node(Bounds(10, 10)));
+    Node* a = new Node(Bounds(50.1f, 50.1f));
+    tree.Insert(a);
+    Node* b = new Node(Bounds(60, 80));
+    tree.Insert(b);
+    Node* c = new Node(Bounds(90, 120));
+    tree.Insert(c);
+    Node* d = new Node(Bounds(150, 150));
+    tree.Insert(d);
+    Node* e = new Node(Bounds(10, 10));
+    tree.Insert(e);
 
     std::cout << "노드 삽입 완료.\n";
+
+    tree.Remove(b);
 
     Node testNode(Bounds(45, 45, 20, 40));
     std::vector<Node*> intersects = tree.Query(&testNode);
@@ -36,6 +43,12 @@ int main()
             std::cout << "(" << node->GetBounds().X() << "," << node->GetBounds().Y() << ")\n";
         }
     }
+
+    delete a;
+    delete b;
+    delete c;
+    delete d;
+    delete e;
 
     std::cin.get();
 }

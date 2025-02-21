@@ -28,40 +28,14 @@ enum class NodeIndex
 class Node
 {
 public:
-    struct NodeHash
-    {
-        size_t operator()(const Node* node) const
-        {
-            size_t h1 = std::hash<float>()(node->GetBounds().X());
-            size_t h2 = std::hash<float>()(node->GetBounds().Y());
-            size_t h3 = std::hash<float>()(node->GetBounds().Width());
-            size_t h4 = std::hash<float>()(node->GetBounds().Height());
-
-            // 해시 값들을 조합해서 유니크한 해시 값 생성.
-            return h1 ^ (h2 << 1) ^ (h3 << 2) ^ (h4 << 3);
-        }
-    };
-
-    struct NodeEqual
-    {
-        bool operator()(const Node* left, const Node* right) const
-        {
-            const float EPSILON = 1e-6f;
-
-            return std::fabs(left->GetBounds().X() - right->GetBounds().X()) < EPSILON &&
-                std::fabs(left->GetBounds().Y() - right->GetBounds().Y()) < EPSILON &&
-                std::fabs(left->GetBounds().Width() - right->GetBounds().Width()) < EPSILON &&
-                std::fabs(left->GetBounds().Height() - right->GetBounds().Height()) < EPSILON;
-        }
-
-    };
-
-public:
     Node(const Bounds& bounds, int depth = 0);
     ~Node();
 
     // 삽입(Insert).
     void Insert(Node* node);
+
+    // 삭제(Remove).
+    void Remove(Node* node);
 
     // 질의(Query).
     void Query(const Bounds& queryBounds, std::vector<Node*>& possibleNodes);
@@ -74,7 +48,7 @@ public:
     Bounds GetBounds() const { return bounds; }
 
     // 현재 영역에 포함된 노드.
-    const std::unordered_set<Node*, NodeHash, NodeEqual>& Points() const { return points; }
+    const std::unordered_set<Node*>& Points() const { return points; }
 
     // 자식 노드.
     Node* TopLeft() const { return topLeft; }
@@ -106,7 +80,7 @@ private:
     Bounds bounds;
 
     // 현재 영역에 포함된 노드.
-    std::unordered_set<Node*, NodeHash, NodeEqual> points;
+    std::unordered_set<Node*> points;
 
     // 자식 노드.
     Node* topLeft = nullptr;

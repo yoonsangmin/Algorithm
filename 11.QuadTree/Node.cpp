@@ -1,4 +1,6 @@
-﻿#include "Node.h"
+﻿#include <iostream>
+
+#include "Node.h"
 #include "QuadTree.h"
 
 Node::Node(const Bounds& bounds, int depth)
@@ -51,6 +53,51 @@ void Node::Insert(Node* node)
     }
 }
 
+void Node::Remove(Node* node)
+{
+    // 겹치는 영역 확인.
+    NodeIndex result = TestRegion(node->GetBounds());
+
+    // 영역에 없는 경우 무시.
+    if (result == NodeIndex::OutOfArea)
+    {
+        return;
+    }
+
+    // 현재 노드에서 삭제 시도.
+    for (auto iter = points.begin(); iter != points.end(); ++iter)
+    {
+        if (node == *iter)
+        {
+            std::cout << "(" << node->bounds.X() << "," << node->bounds.Y() << ") ";
+            std::cout << "노드를 삭제했습니다.\n";
+            points.erase(iter);
+            return;
+        }
+    }
+
+    // 삭제되지 않은 경우 포함된 하위 영역에서 확인.
+    if (IsDivded())
+    {
+        if (result == NodeIndex::TopLeft)
+        {
+            topLeft->Remove(node);
+        }
+        else if (result == NodeIndex::TopRight)
+        {
+            topRight->Remove(node);
+        }
+        else if (result == NodeIndex::BottomLeft)
+        {
+            bottomLeft->Remove(node);
+        }
+        else if (result == NodeIndex::BottomRight)
+        {
+            bottomRight->Remove(node);
+        }
+    }
+}
+
 void Node::Query(const Bounds& queryBounds, std::vector<Node*>& possibleNodes)
 {
     // 현재 노드 추가.
@@ -87,14 +134,15 @@ void Node::Query(const Bounds& queryBounds, std::vector<Node*>& possibleNodes)
 
 void Node::Clear()
 {
-    // 현재 노드 제거.
-    for (Node* node : points)
-    {
-        SafeDelete(node);
-    }
+    // 지우지 않기 - Node의 소유자가 내가 아님.
+    //// 현재 노드 제거.
+    //for (Node* node : points)
+    //{
+    //    SafeDelete(node);
+    //}
 
-    // 리스트 정리.
-    points.clear();
+    //// 리스트 정리.
+    //points.clear();
 
     // 분할된 경우 자식 정리.
     if (IsDivded())
